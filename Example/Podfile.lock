@@ -1,10 +1,15 @@
 PODS:
   - LRNotificationObserver (0.1)
+  - ObjcAssociatedObjectHelpers (1.2.1)
 
 DEPENDENCIES:
   - LRNotificationObserver
+  - ObjcAssociatedObjectHelpers (~> 1.2.0)
 
 SPEC CHECKSUMS:
-  LRNotificationObserver: 017f5ee9e826c1705641127999dd66b2e2d1efe0
+  LRNotificationObserver: 0b1af6bce363e771d86d65b4d4002af772a84729
+  ObjcAssociatedObjectHelpers: d55d2e18f1b51764577723cf4b94cf05c1838534
 
-COCOAPODS: 0.29.0
+PODFILE CHECKSUM: 33ddb6c72d9c18b7bdde8808872e6ceb65ae8aee
+
+COCOAPODS: 1.0.1
