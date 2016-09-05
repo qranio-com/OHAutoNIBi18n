@@ -1,5 +1,11 @@
 LRNotificationObserver
 ======================
+
+[![Build Status](http://img.shields.io/travis/luisrecuenco/LRNotificationObserver/master.svg?style=flat)](https://travis-ci.org/luisrecuenco/LRNotificationObserver)
+[![Pod Version](http://img.shields.io/cocoapods/v/LRNotificationObserver.svg?style=flat)](http://cocoadocs.org/docsets/LRNotificationObserver/)
+[![Pod Platform](http://img.shields.io/cocoapods/p/LRNotificationObserver.svg?style=flat)](http://cocoadocs.org/docsets/LRNotificationObserver/)
+[![Pod License](http://img.shields.io/cocoapods/l/LRNotificationObserver.svg?style=flat)](https://www.apache.org/licenses/LICENSE-2.0.html)
+
 LRNotificationObserver is a smarter, simpler and better way to use NSNotificationCenter with [RAII](http://en.wikipedia.org/wiki/Resource_Acquisition_Is_Initialization).
 
 ### The problem about NSNotificationCenter
@@ -157,13 +163,7 @@ Selector that specifies the message the receiver sends notificationObserver to n
 
 ### Tests
 
-In order to run the test suit, you should have the latest version of xctool. This can be done as follows.
-
-```
-rake test:prepare_for_xctool
-```
-
-After that, running the tests is as simple as executing the rakefile.
+Running the tests is as simple as executing the rakefile.
 
 ```
 rake
@@ -179,7 +179,7 @@ rake test:cocoa_pods
 
 ### Requirements
 
-LRNotificationObserver requires both iOS 6.0 and ARC.
+LRNotificationObserver requires either iOS 6.0 or Mac OS X 10.8 and ARC.
 
 You can still use LRNotificationObserver in your non-arc project. Just set -fobjc-arc compiler flag in every source file.
 

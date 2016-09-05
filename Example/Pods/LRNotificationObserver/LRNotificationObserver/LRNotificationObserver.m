@@ -23,12 +23,6 @@
 #import "LRNotificationObserver.h"
 #import <objc/message.h>
 
-#if OS_OBJECT_USE_OBJC
-#define LRDispatchQueuePropertyModifier strong
-#else
-#define LRDispatchQueuePropertyModifier assign
-#endif
-
 #pragma mark - LRTargetAction
 
 @interface LRTargetAction : NSObject
@@ -55,8 +49,7 @@
 
 #pragma mark - LRNotificationObserver
 
-static SEL sNoArgumentsSelector;
-static SEL sOneArgumentsSelector;
+static SEL sNotificationFiredAction;
 
 @interface LRNotificationObserver ()
 
@@ -73,7 +66,7 @@ static SEL sOneArgumentsSelector;
 
 // Calback queues
 @property (nonatomic, strong) NSOperationQueue *operationQueue;
-@property (nonatomic, LRDispatchQueuePropertyModifier) dispatch_queue_t dispatchQueue;
+@property (nonatomic, strong) dispatch_queue_t dispatchQueue;
 
 @end
 
@@ -83,8 +76,7 @@ static SEL sOneArgumentsSelector;
 {
     if (self == [LRNotificationObserver class])
     {
-        sNoArgumentsSelector = @selector(notificationFired);
-        sOneArgumentsSelector = @selector(notificationFired:);
+        sNotificationFiredAction = @selector(notificationFired:);
     }
 }
 
@@ -177,7 +169,7 @@ static SEL sOneArgumentsSelector;
     self.block = block;
     
     [self.notificationCenter addObserver:self
-                                selector:sOneArgumentsSelector
+                                selector:sNotificationFiredAction
                                     name:name
                                   object:object];
 }
@@ -271,39 +263,17 @@ static SEL sOneArgumentsSelector;
     self.dispatchQueue = dispatchQueue;
     self.targetAction = [LRTargetAction targetActionWithTarget:target action:action];
     
-    NSUInteger selectorArgumentCount = LRSelectorArgumentCount(target, action);
+    __unused NSUInteger selectorArgumentCount = LRSelectorArgumentCount(target, action);
     
-    SEL correctSelector = NULL;
-    
-    if (selectorArgumentCount == 0)
-    {
-        correctSelector = sNoArgumentsSelector;
-    }
-    else if (selectorArgumentCount == 1)
-    {
-        correctSelector = sOneArgumentsSelector;
-    }
-    else
-    {
-        NSAssert(NO, @"Wrong number of parameters");
-    }
+    NSParameterAssert(selectorArgumentCount <= 1);
     
     [self.notificationCenter addObserver:self
-                                selector:correctSelector
+                                selector:sNotificationFiredAction
                                     name:name
                                   object:object];
 }
 
 #pragma mark - Callbacks
-
-- (void)notificationFired
-{
-    dispatch_block_t notificationFiredBlock = ^{
-        objc_msgSend(self.targetAction.target, self.targetAction.action);
-    };
-    
-    [self executeNotificationFiredBlock:notificationFiredBlock];
-}
 
 - (void)notificationFired:(NSNotification *)notification
 {
@@ -312,8 +282,8 @@ static SEL sOneArgumentsSelector;
         {
             self.block(notification);
         }
-        
-        objc_msgSend(self.targetAction.target, self.targetAction.action, notification);
+        void (*action)(id, SEL, id) = (void (*)(id, SEL, id))objc_msgSend;
+        action(self.targetAction.target, self.targetAction.action, notification);
     };
     
     [self executeNotificationFiredBlock:notificationFiredBlock];
@@ -323,11 +293,25 @@ static SEL sOneArgumentsSelector;
 {
     if (self.operationQueue)
     {
-        [self.operationQueue addOperationWithBlock:block];
+        if ([NSThread isMainThread] && self.operationQueue == [NSOperationQueue mainQueue])
+        {
+            block();
+        }
+        else
+        {
+            [self.operationQueue addOperationWithBlock:block];
+        }
     }
     else if (self.dispatchQueue)
     {
-        dispatch_async(self.dispatchQueue, block);
+        if ([NSThread isMainThread] && self.dispatchQueue == dispatch_get_main_queue())
+        {
+            block();
+        }
+        else
+        {
+            dispatch_async(self.dispatchQueue, block);
+        }
     }
     else
     {
@@ -346,13 +330,6 @@ static SEL sOneArgumentsSelector;
     _block = nil;
     _targetAction = nil;
     _operationQueue = nil;
-    
-#if !OS_OBJECT_USE_OBJC
-    if (_dispatchQueue)
-    {
-        dispatch_release(_dispatchQueue);
-    }
-#endif
     _dispatchQueue = nil;
 }
 
