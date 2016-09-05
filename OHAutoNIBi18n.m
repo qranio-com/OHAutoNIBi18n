@@ -8,8 +8,7 @@
 #import "OHAutoNIBi18n.h"
 #import <objc/runtime.h>
 #import <UIKit/UIKit.h>
-#import "LRNotificationObserver+Owner.h"
-#import "NSObject+AssociatedDictionary.h"
+
 
 NSString* const OHAutoNIBi18nCustomBundle = @"OHAutoNIBi18nCustomBundle";
 
