@@ -31,7 +31,9 @@ static NSBundle *_customBundle = nil;
 void OHAutoNIBi18nSetCustomBundle(NSBundle *customBundle) {
     if (customBundle && [customBundle isKindOfClass:[NSBundle class]] && customBundle != _customBundle) {
         _customBundle = customBundle;
+        #if DEBUG
         NSLog(@"Locale changed! New bundle: %@", _customBundle);
+        #endif
     }
 }
 
@@ -76,7 +78,9 @@ void OHAutoNIBi18nSetCustomBundle(NSBundle *customBundle) {
     if (isLocalizable(self)) {
 #ifdef OHAutoNIBi18n_OBSERVE_LOCALE
         [LRNotificationObserver observeName:NSCurrentLocaleDidChangeNotification owner:self block:^(NSNotification *notification) {
+            #if DEBUG
             NSLog(@"Updating localization for %@ to %@", self, [[_customBundle bundlePath]lastPathComponent]);
+            #endif
             [self updateLocalization];
         }];
 #endif
@@ -124,12 +128,16 @@ static NSString* localizedString(NSString* aString)
             // and will be replaced by code later, so don't warn about them
 			return aString;
 		}
+        #if DEBUG
 		NSLog(@"No translation for string '%@'",aString);
+        #endif
 		tr = [NSString stringWithFormat:@"$%@$",aString];
 	}
 	return tr;
 #else
+    #if DEBUG
     NSLog(@"string: %@, localization: %@", aString, NSLocalizedString(aString, kNoTranslation));
+    #endif
     return [srcBundle localizedStringForKey:aString value:nil table:nil];
 #endif
 }
