@@ -94,10 +94,13 @@ void OHAutoNIBi18nSetCustomBundle(NSBundle *customBundle) {
 #ifndef OHAutoNIBi18n_AUTOLOAD_OFF
 +(void)load
 {
-    // Autoload : swizzle -awakeFromNib with -localizeNibObject as soon as the app (and thus this class) is loaded
-	Method localizeNibObject = class_getInstanceMethod([NSObject class], @selector(localizeNibObject));
-	Method awakeFromNib = class_getInstanceMethod([NSObject class], @selector(awakeFromNib));
-	method_exchangeImplementations(awakeFromNib, localizeNibObject);
+    static dispatch_once_t once;
+    dispatch_once(&once, ^{
+        // Autoload : swizzle -awakeFromNib with -localizeNibObject as soon as the app (and thus this class) is loaded
+        Method localizeNibObject = class_getInstanceMethod([NSObject class], @selector(localizeNibObject));
+        Method awakeFromNib = class_getInstanceMethod([NSObject class], @selector(awakeFromNib));
+        method_exchangeImplementations(awakeFromNib, localizeNibObject);
+    });
 }
 #endif
 
