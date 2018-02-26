@@ -122,7 +122,7 @@ static NSString* localizedString(NSString* aString)
 #ifdef OHAutoNIBi18n_DEBUG
 #warning Debug mode for i18n is active
     static NSString* const kNoTranslation = @"";
-	NSString* tr = [srcBundle localizedStringForKey:aString value:kNoTranslation table:nil];
+	N   SString* tr = [srcBundle localizedStringForKey:aString value:kNoTranslation table:nil];
 	if ([tr isEqualToString:kNoTranslation])
     {
 		if ([aString hasPrefix:@"•."])
@@ -139,7 +139,7 @@ static NSString* localizedString(NSString* aString)
 	return tr;
 #else
     #if DEBUG
-    NSLog(@"string: %@, localization: %@", aString, NSLocalizedString(aString, kNoTranslation));
+    // NSLog(@"string: %@, localization: %@", aString, NSLocalizedString(aString, kNoTranslation));
     #endif
     return [srcBundle localizedStringForKey:aString value:nil table:nil];
 #endif
